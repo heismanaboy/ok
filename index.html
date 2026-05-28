@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>saikyo pos</title>
+    
+
+  </head>
+    
+  <body>
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>SAIKYO APARTMENT & HOTEL | POS System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background: #2c2c2c; /* dark grey base */
+            padding: 24px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* main POS container - orange & grey theme */
+        .pos-container {
+            max-width: 1400px;
+            width: 100%;
+            background: #3a3a3a; /* mid grey */
+            border-radius: 32px;
+            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        /* header section */
+        .brand-header {
+            background: #e67e22; /* vibrant orange */
+            padding: 1.2rem 2rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .brand-header h1 {
+            font-size: 1.8rem;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        .brand-header p {
+            font-size: 1rem;
+            background: rgba(0,0,0,0.2);
+            padding: 6px 12px;
+            border-radius: 40px;
+            font-weight: 500;
+        }
+
+        /* two column layout */
+        .pos-main {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        /* left side: room selection & cart */
+        .sales-panel {
+            flex: 2;
+            min-width: 280px;
+            background: #4a4a4a; /* grey tone */
+            padding: 20px;
+            border-right: 2px solid #e67e22;
+        }
+
+        /* right side: receipt preview & action */
+        .receipt-panel {
+            flex: 1.2;
+            min-width: 320px;
+            background: #353535;
+            padding: 20px;
+            color: #f0f0f0;
+        }
+
+        /* room cards grid */
+        .rooms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 18px;
+            margin-bottom: 32px;
+        }
+
+        .room-card {
+            background: #2e2e2e;
+            border-radius: 20px;
+            padding: 16px;
+            transition: all 0.2s ease;
+            border-left: 5px solid #e67e22;
+            cursor: pointer;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+        }
+
+        .room-card:hover {
+            background: #3d3d3d;
+            transform: translateY(-3px);
+        }
+
+        .room-name {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #f39c12;
+            margin-bottom: 8px;
+        }
+
+        .room-price {
+            font-size: 1rem;
+            color: #ddd;
+            margin-bottom: 12px;
+        }
+
+        .room-price span {
+            color: #e67e22;
+            font-weight: bold;
+        }
+
+        .add-btn {
+            background: #e67e22;
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 40px;
+            font-weight: bold;
+            width: 100%;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .add-btn:hover {
+            background: #d35400;
+        }
+
+        /* cart section */
+        .cart-section {
+            background: #2c2c2c;
+            border-radius: 24px;
+            padding: 16px;
+            margin-top: 10px;
+        }
+
+        .cart-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #e67e22;
+            border-bottom: 2px solid #e67e22;
+            display: inline-block;
+            margin-bottom: 16px;
+        }
+
+        .cart-items {
+            max-height: 280px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .cart-item {
+            background: #3f3f3f;
+            margin: 8px 0;
+            padding: 12px;
+            border-radius: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .item-info {
+            font-weight: 500;
+        }
+
+        .item-qty {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #2e2e2e;
+            padding: 4px 10px;
+            border-radius: 40px;
+        }
+
+        .qty-btn {
+            background: #e67e22;
+            border: none;
+            color: white;
+            width: 26px;
+            height: 26px;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .qty-btn.danger {
+            background: #a04000;
+        }
+
+        .item-price {
+            min-width: 80px;
+            text-align: right;
+            font-weight: bold;
+            color: #f39c12;
+        }
+
+        .cart-total {
+            text-align: right;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border-top: 2px dashed #e67e22;
+            padding-top: 12px;
+            margin-top: 8px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn-checkout {
+            background: #e67e22;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 40px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            flex: 2;
+        }
+
+        .btn-clear {
+            background: #555;
+            color: #eee;
+            border: none;
+            padding: 12px;
+            border-radius: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        /* receipt panel */
+        .receipt-card {
+            background: #2a2a2a;
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .receipt-header {
+            text-align: center;
+            border-bottom: 1px dashed #e67e22;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+        }
+
+        .receipt-header h2 {
+            color: #e67e22;
+            font-size: 1.5rem;
+        }
+
+        .receipt-details {
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            background: #1e1e1e;
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            max-height: 380px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            color: #f0f0f0;
+        }
+
+        .print-btn {
+            background: #e67e22;
+            width: 100%;
+            border: none;
+            padding: 12px;
+            border-radius: 40px;
+            font-weight: bold;
+            font-size: 1rem;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .print-btn:hover {
+            background: #cf711f;
+        }
+
+        .reset-receipt-btn {
+            background: #3a3a3a;
+            margin-top: 12px;
+            border: 1px solid #e67e22;
+            color: #e67e22;
+        }
+
+        footer {
+            background: #2b2b2b;
+            text-align: center;
+            padding: 12px;
+            font-size: 0.75rem;
+            color: #aaa;
+            border-top: 1px solid #e67e22;
+        }
+
+        @media (max-width: 800px) {
+            body {
+                padding: 12px;
+            }
+            .brand-header h1 {
+                font-size: 1.3rem;
+            }
+        }
+
+        button {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="pos-container">
+    <div class="brand-header">
+        <h1> SAIKYO APARTMENT AND HOTEL</h1>
+        <p> Luxury & Comfort | Pokuase - Ghana</p>
+    </div>
+
+    <div class="pos-main">
+        <!-- LEFT: ROOMS + CART -->
+        <div class="sales-panel">
+            <div style="margin-bottom: 10px;">
+                <span style="background:#e67e22; padding:4px 12px; border-radius: 40px; color:white; font-weight:bold;"> ROOM SELECTION</span>
+            </div>
+            <div class="rooms-grid" id="roomsGrid"></div>
+
+            <!-- Shopping Cart -->
+            <div class="cart-section">
+                <div class="cart-title">🛒 Current Order</div>
+                <div id="cartItemsContainer" class="cart-items">
+                    <!-- dynamic cart items -->
+                    <div style="text-align:center; color:#aaa;">No items added</div>
+                </div>
+                <div class="cart-total" id="cartTotalDisplay">Total: GHS 0.00</div>
+                <div class="action-buttons">
+                    <button class="btn-checkout" id="checkoutBtn">✅ COMPLETE SALE</button>
+                    <button class="btn-clear" id="clearCartBtn">🗑️ Clear Cart</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: RECEIPT PREVIEW & PRINT -->
+        <div class="receipt-panel">
+            <div class="receipt-card">
+                <div class="receipt-header">
+                    <h2>🧾 RECEIPT</h2>
+                    <small>SAIKYO APARTMENT & HOTEL</small>
+                </div>
+                <div id="receiptContent" class="receipt-details">
+                    <!-- live receipt preview -->
+                    No sale yet. Add rooms and click "COMPLETE SALE".
+                </div>
+                <button class="print-btn" id="printReceiptBtn">🖨️ PRINT RECEIPT</button>
+                <button class="print-btn reset-receipt-btn" id="resetDemoReceiptBtn">⟳ New Session / Reset</button>
+                <small style="display:block; text-align:center; margin-top:10px;">⬇️ After sale, receipt updates automatically</small>
+            </div>
+        </div>
+    </div>
+    <footer>
+        ⚡ SAIKYO APARTMENT | Spacious Studio (550₵/night) | Standard Rooms (350₵/night) | 30+1 unique rooms
+    </footer>
+</div>
+
+<script>
+    // ------ ROOM DEFINITIONS ------
+    // Studio room (spacious studio with kitchen)
+    const STUDIO_ROOM = {
+        id: "studio_saikyo",
+        name: " SPACIOUS STUDIO (Kitchen included)",
+        pricePerNight: 550,
+        category: "Studio Suite",
+        quantityLimit: 10   // max per transaction reasonable but no strict limit for demo
+    };
+
+    // 30 other standard rooms
+    const STANDARD_ROOMS_BASE = {
+        idPrefix: "std_room",
+        name: " Standard Deluxe Room",
+        pricePerNight: 350,
+        category: "Standard"
+    };
+
+    // Build array of all selectable rooms: 1 studio + 30 standard rooms (each as individual item)
+    // But for POS ease: we treat each room as its own line item? To avoid 30 identical entries, but we still show each room distinct.
+    // However hotel may want to sell multiple nights? Our POS: each "room" addition adds ONE night stay for that specific room type.
+    // But for simplicity and to reflect real hotel POS: customer can book multiple nights and multiple rooms. We'll implement quantity per room type.
+    // However better design: we have TWO product types: "Studio Room (per night)" and "Standard Room (per night)". 
+    // But business spec says: "one spacious studio room (price 550 cedis per night) and 30 other rooms (price 350 cedis per night)".
+    // So we present 2 categories but we need to reflect that 30 other rooms exist - for sales we treat as same product type "Standard Room (per night)".
+    // But to show inventory respect, we can simply have two buttons: add Studio Night, add Standard Night. But we also want to allow multiple quantities.
+    // However to keep interface clear, we design: each room card = one night stay for that room type, and you can add multiple nights.
+    // But to represent 30 rooms, we show one card "Standard Room (30 available)" but price per night. It's intuitive. Or we can show each room but 30 would be huge.
+    // Better to keep UI clean: Display two main options with quantity selector: 1) Studio Room (550₵/night) 2) Standard Room (350₵/night) + note about 30 rooms.
+    // But original spec: "which contain one spacious studio room with a kitchen and 30 other rooms". I build representative pos: two product types with stock awareness?
+    // For user story: it shows two categories, user can add multiple nights of each. This captures sales tracking & receipt.
+    
+    // We decide: two primary sale items: "Studio Suite (per night)" and "Standard Room (per night)". Show that there are 30 standard rooms available as info.
+    // This preserves accuracy and easy pos. Let's also display remaining capacity note (soft, but not inventory enforcement for demo - but we can track separately).
+    
+    const PRODUCTS = [
+        {
+            id: "studio_suite",
+            name: " SPACIOUS STUDIO (Kitchen) | 1 room",
+            price: 550,
+            description: "Per night, premium studio",
+            icon: ""
+        },
+        {
+            id: "standard_room",
+            name: " STANDARD ROOM (30 rooms available)",
+            price: 350,
+            description: "Per night, cozy & elegant",
+            icon: ""
+        }
+    ];
+
+    // Cart state: array of items { productId, productName, price, quantity }
+    let cart = [];
+    
+    // Sales history (for receipt printing, current transaction receipt)
+    let lastReceiptHTML = "";      // stores last generated receipt content
+    let lastTransactionTotal = 0;
+    let lastTransactionItems = [];
+
+    // Helper: update cart UI + total + realtime receipt preview
+    function updateCartUI() {
+        const cartContainer = document.getElementById('cartItemsContainer');
+        const totalSpan = document.getElementById('cartTotalDisplay');
+        if (!cartContainer) return;
+
+        if (cart.length === 0) {
+            cartContainer.innerHTML = '<div style="text-align:center; color:#aaa;">🛒 No items added. Add rooms to start sale.</div>';
+            totalSpan.innerText = `Total: GHS 0.00`;
+            updateReceiptPreview(); // show empty receipt preview
+            return;
+        }
+
+        let cartHtml = '';
+        let grandTotal = 0;
+
+        cart.forEach((item, idx) => {
+            const itemTotal = item.price * item.quantity;
+            grandTotal += itemTotal;
+            cartHtml += `
+                <div class="cart-item">
+                    <div class="item-info">
+                        <strong>${item.productName}</strong><br/>
+                        <small>${item.price}₵ / night</small>
+                    </div>
+                    <div class="item-qty">
+                        <button class="qty-btn" data-index="${idx}" data-delta="-1">−</button>
+                        <span style="min-width: 30px; text-align:center;">${item.quantity}</span>
+                        <button class="qty-btn" data-index="${idx}" data-delta="1">+</button>
+                        <button class="qty-btn danger" data-index="${idx}" data-delta="remove" style="background:#a04000;">🗑️</button>
+                    </div>
+                    <div class="item-price">${itemTotal.toFixed(2)}₵</div>
+                </div>
+            `;
+        });
+
+        cartContainer.innerHTML = cartHtml;
+        totalSpan.innerText = `Total: GHS ${grandTotal.toFixed(2)}`;
+
+        // attach event listeners for qty buttons (dynamic)
+        document.querySelectorAll('.qty-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const indexAttr = btn.getAttribute('data-index');
+                if (indexAttr === null) return;
+                const idx = parseInt(indexAttr, 10);
+                const delta = btn.getAttribute('data-delta');
+                if (delta === 'remove') {
+                    // remove entire item
+                    cart.splice(idx, 1);
+                    updateCartUI();
+                } else {
+                    const deltaNum = parseInt(delta, 10);
+                    if (!isNaN(deltaNum) && cart[idx]) {
+                        let newQty = cart[idx].quantity + deltaNum;
+                        if (newQty <= 0) {
+                            cart.splice(idx, 1);
+                        } else {
+                            cart[idx].quantity = newQty;
+                        }
+                        updateCartUI();
+                    }
+                }
+            });
+        });
+    }
+
+    // generate receipt text / html based on current cart (before sale) as preview, but after sale we set lastReceipt
+    // we want the right panel to show ongoing preview, then after checkout it shows final receipt with timestamp.
+    // For live preview we generate from cart if no transaction finalized? But final receipt is after checkout.
+    // We will differentiate: preview mode = current cart (unsaved), after sale update lastReceiptHTML and set preview to that.
+    // But requirement: track sales and printout receipts. We will save each sale but we can display current sale preview always.
+    // After checkout we show final receipt with date/time.
+    
+    let saleCompletedFlag = false; // to toggle showing final receipt vs cart preview
+    
+    function generateReceiptFromCart(itemsArray, totalAmount, saleTime = null, isFinal = false) {
+        const now = saleTime ? new Date(saleTime) : new Date();
+        const dateStr = now.toLocaleString('en-GH', { hour12: true });
+        let receiptLines = [];
+        receiptLines.push(`=================================`);
+        receiptLines.push(`    SAIKYO APARTMENT & HOTEL`);
+        receiptLines.push(`    "Luxury & Comfort Redefined"`);
+        receiptLines.push(`---------------------------------`);
+        receiptLines.push(`Date: ${dateStr}`);
+        receiptLines.push(`---------------------------------`);
+        receiptLines.push(`ITEMS:`);
+        
+        let lineTotal = 0;
+        for (let item of itemsArray) {
+            const itemLine = `${item.productName}  x${item.quantity}  @ GHS ${item.price.toFixed(2)}`;
+            const totalItem = item.price * item.quantity;
+            receiptLines.push(itemLine);
+            receiptLines.push(`            → GHS ${totalItem.toFixed(2)}`);
+            lineTotal += totalItem;
+        }
+        receiptLines.push(`---------------------------------`);
+        receiptLines.push(`SUB TOTAL:   GHS ${lineTotal.toFixed(2)}`);
+        receiptLines.push(`TAX (0%):    GHS 0.00`);
+        receiptLines.push(`TOTAL:       GHS ${totalAmount.toFixed(2)}`);
+        receiptLines.push(`---------------------------------`);
+        receiptLines.push(`PAYMENT:     Cash / Mobile Money`);
+        receiptLines.push(`STATUS:      PAID`);
+        receiptLines.push(`THANK YOU!`);
+        receiptLines.push(`Visit Again: SAIKYO APARTMENT`);
+        receiptLines.push(`=================================`);
+        return receiptLines.join('\n');
+    }
+    
+    function updateReceiptPreview() {
+        const receiptDiv = document.getElementById('receiptContent');
+        if (!receiptDiv) return;
+        // If we just completed a sale, we display last receipt (most recent transaction)
+        if (saleCompletedFlag && lastReceiptHTML) {
+            receiptDiv.innerText = lastReceiptHTML;
+            return;
+        }
+        // else show live cart preview (unsold)
+        if (cart.length === 0) {
+            receiptDiv.innerText = "🧾 No items in cart.\nAdd rooms and click 'COMPLETE SALE' to generate receipt.";
+            return;
+        }
+        let total = 0;
+        const itemsForPreview = cart.map(item => ({
+            productName: item.productName,
+            quantity: item.quantity,
+            price: item.price
+        }));
+        for (let i of cart) total += i.price * i.quantity;
+        const previewReceipt = generateReceiptFromCart(itemsForPreview, total, new Date(), false);
+        receiptDiv.innerText = previewReceipt + "\n\n⚠️ PREVIEW MODE — Press 'COMPLETE SALE' to finalize.";
+    }
+    
+    // complete sale: records transaction and updates receipt (final)
+    function completeSale() {
+        if (cart.length === 0) {
+            alert("❌ Cannot complete sale: cart is empty. Please add rooms first.");
+            return;
+        }
+        let totalAmount = 0;
+        const saleItems = cart.map(item => ({
+            productName: item.productName,
+            quantity: item.quantity,
+            price: item.price
+        }));
+        for (let item of cart) totalAmount += item.price * item.quantity;
+        
+        const saleTimestamp = new Date();
+        const finalReceipt = generateReceiptFromCart(saleItems, totalAmount, saleTimestamp, true);
+        lastReceiptHTML = finalReceipt;
+        lastTransactionTotal = totalAmount;
+        lastTransactionItems = [...saleItems];
+        
+        // record sale tracking (simple console & alert) - we also can display cumulative data in a small note.
+        // Additional requirement: track sales -> store in localStorage or array.
+        // We'll maintain a simple sales log array in memory and also show summary count.
+        if (!window.salesLog) window.salesLog = [];
+        window.salesLog.push({
+            timestamp: saleTimestamp.toISOString(),
+            items: saleItems,
+            total: totalAmount,
+            receipt: finalReceipt
+        });
+        
+        // set sale completed flag to show final receipt
+        saleCompletedFlag = true;
+        updateReceiptPreview();   // will display lastReceiptHTML
+        // clear cart after sale? hotel POS standard: after sale we clear cart to start new transaction, but we keep last receipt visible.
+        // make cart empty and reset UI for next sale, but preserve last receipt display.
+        cart = [];
+        updateCartUI();   // cart UI becomes empty, but receipt panel shows completed receipt (since saleCompletedFlag = true)
+        // also show success notification
+        alert(`✅ Sale completed! Total: GHS ${totalAmount.toFixed(2)}\nReceipt ready. You can print it.`);
+        // optionally show in console sales tracking
+        console.log("Sales recorded:", window.salesLog);
+    }
+    
+    function clearCart() {
+        if (cart.length > 0 && confirm("⚠️ Clear entire cart? All items will be removed.")) {
+            cart = [];
+            saleCompletedFlag = false;   // reset flag, preview cart empty
+            updateCartUI();
+            updateReceiptPreview();
+        } else if (cart.length === 0) {
+            alert("Cart already empty.");
+        } else {
+            // cancelled
+        }
+    }
+    
+    // Reset & New Session: clears cart, resets receipt view to empty, clears completed flag.
+    function resetSession() {
+        cart = [];
+        saleCompletedFlag = false;
+        lastReceiptHTML = "";
+        updateCartUI();
+        updateReceiptPreview();
+        alert("New session started. Cart cleared and receipt preview reset.");
+    }
+    
+    // add product to cart (by product id)
+    function addToCart(productId) {
+        const product = PRODUCTS.find(p => p.id === productId);
+        if (!product) return;
+        const existingItem = cart.find(item => item.productId === productId);
+        if (existingItem) {
+            existingItem.quantity += 1;
+        } else {
+            cart.push({
+                productId: product.id,
+                productName: product.name,
+                price: product.price,
+                quantity: 1
+            });
+        }
+        // if we had a past sale completed flag, clear it because new cart modifies ongoing order
+        if (saleCompletedFlag === true) {
+            saleCompletedFlag = false;
+        }
+        updateCartUI();
+        updateReceiptPreview();
+    }
+    
+    // render room cards (two main options with extra note)
+    function renderRoomCards() {
+        const grid = document.getElementById('roomsGrid');
+        if (!grid) return;
+        grid.innerHTML = '';
+        PRODUCTS.forEach(prod => {
+            const card = document.createElement('div');
+            card.className = 'room-card';
+            let extraNote = '';
+            if (prod.id === 'standard_room') {
+                extraNote = '<div style="font-size:0.75rem; color:#f39c12;">✨ 30 spacious rooms available</div>';
+            } else {
+                extraNote = '<div style="font-size:0.75rem; color:#f39c12;">🍳 1 premium studio with kitchen</div>';
+            }
+            card.innerHTML = `
+                <div class="room-name">${prod.icon} ${prod.name}</div>
+                <div class="room-price">💰 <span>${prod.price} GHS</span> / per night</div>
+                ${extraNote}
+                <button class="add-btn" data-id="${prod.id}">➕ Add to Order</button>
+            `;
+            const btn = card.querySelector('.add-btn');
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                addToCart(prod.id);
+            });
+            grid.appendChild(card);
+        });
+        // also add info note
+        const infoNote = document.createElement('div');
+        infoNote.style.gridColumn = '1/-1';
+        infoNote.style.background = '#e67e2222';
+        infoNote.style.borderRadius = '20px';
+        infoNote.style.padding = '8px';
+        infoNote.style.textAlign = 'center';
+        infoNote.style.fontSize = '0.85rem';
+        infoNote.style.color = '#ffd966';
+        infoNote.innerHTML = '🏨 SAIKYO APARTMENT: All rates are per night. Add multiple nights / multiple rooms.';
+        grid.appendChild(infoNote);
+    }
+    
+    function attachGlobalEvents() {
+        const checkoutBtn = document.getElementById('checkoutBtn');
+        const clearCartBtn = document.getElementById('clearCartBtn');
+        const printBtn = document.getElementById('printReceiptBtn');
+        const resetBtn = document.getElementById('resetDemoReceiptBtn');
+        
+        if (checkoutBtn) checkoutBtn.addEventListener('click', completeSale);
+        if (clearCartBtn) clearCartBtn.addEventListener('click', clearCart);
+        if (printBtn) {
+            printBtn.addEventListener('click', () => {
+                const receiptElem = document.getElementById('receiptContent');
+                if (!receiptElem || !receiptElem.innerText.trim() || receiptElem.innerText.includes("No sale yet") || receiptElem.innerText.includes("PREVIEW MODE")) {
+                    if (cart.length > 0 && !saleCompletedFlag) {
+                        alert("⚠️ This is a preview. Please complete sale first to print official receipt.");
+                    } else if (cart.length === 0 && !lastReceiptHTML) {
+                        alert("No receipt available. Add items and complete a sale.");
+                    } else if (lastReceiptHTML && saleCompletedFlag) {
+                        printReceiptText(lastReceiptHTML);
+                    } else {
+                        alert("No valid receipt to print.");
+                    }
+                } else {
+                    // if final receipt available
+                    if (lastReceiptHTML && saleCompletedFlag) {
+                        printReceiptText(lastReceiptHTML);
+                    } else if (saleCompletedFlag === false && cart.length > 0) {
+                        alert("Please complete sale before printing final receipt.");
+                    } else {
+                        printReceiptText(receiptElem.innerText);
+                    }
+                }
+            });
+        }
+        if (resetBtn) resetBtn.addEventListener('click', resetSession);
+    }
+    
+    function printReceiptText(textContent) {
+        const printWindow = window.open('', '_blank', 'width=400,height=600');
+        if (!printWindow) {
+            alert("Please allow pop-ups to print receipt.");
+            return;
+        }
+        printWindow.document.write(`
+            <html>
+            <head><title>SAIKYO APARTMENT RECEIPT</title>
+            <style>
+                body { font-family: 'Courier New', monospace; padding: 20px; background: #f4f4f0; }
+                pre { white-space: pre-wrap; font-size: 14px; background: white; padding: 16px; border-radius: 12px; box-shadow: 0 0 5px rgba(0,0,0,0.1);}
+            </style>
+            </head>
+            <body><pre>${textContent}</pre><script>window.onload=function(){ window.print(); setTimeout(()=>window.close(),800); }<\/script></body>
+            </html>
+        `);
+        printWindow.document.close();
+    }
+    
+    function init() {
+        renderRoomCards();
+        attachGlobalEvents();
+        updateCartUI();
+        updateReceiptPreview();
+        // Track sales array init
+        if (!window.salesLog) window.salesLog = [];
+    }
+    
+    init();
+</script>
+</body>
+</html>
+    
+  </body>
+  
+</html>
